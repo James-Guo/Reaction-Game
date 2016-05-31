@@ -51,7 +51,7 @@ def drawCircle():
         y = random.randint(0, WINDOWHEIGHT)
 
     pygame.draw.circle(DISPLAYSURF, RED, (x, y), 10, 0)
-    print(x, y)
+
 
 
 def getColour(x, y):
