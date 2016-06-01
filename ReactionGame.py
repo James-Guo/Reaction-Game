@@ -12,8 +12,15 @@ WINDOWHEIGHT = 480  # size of windows' height in pixels
 RED = (255,   0,   0)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+YELLOW   = (255, 255,   0)
 
 DARK_RED = (200, 0, 0)
+
+HIGHLIGHTCOLOUR = DARK_RED
+CIRCLECOLOUR = RED
+
 
 global FPSCLOCK, DISPLAYSURF
 pygame.init()
@@ -41,16 +48,26 @@ def playSound():
     beep.play()
 
 
-def drawCircle():
-    x = random.randint(0, WINDOWWIDTH)
-    if x < 200:
-        y = random.randint(75, WINDOWHEIGHT)
-    elif x > WINDOWWIDTH - 200:
-        y = random.randint(0, WINDOWHEIGHT - 75)
-    else:
-        y = random.randint(0, WINDOWHEIGHT)
+def drawCircle(x, y, clicked):
+    if clicked is True:
+        pygame.draw.circle(DISPLAYSURF, WHITE, (x, y), 10, 0)
+        x = random.randint(0, WINDOWWIDTH)
+        if x < 200:
+            y = random.randint(75, WINDOWHEIGHT)
+        elif x > WINDOWWIDTH - 200:
+            y = random.randint(0, WINDOWHEIGHT - 75)
+        else:
+            y = random.randint(0, WINDOWHEIGHT)
 
-    pygame.draw.circle(DISPLAYSURF, RED, (x, y), 10, 0)
+    pygame.draw.circle(DISPLAYSURF, CIRCLECOLOUR, (x, y), 10, 0)
+
+    return x, y 
+
+def drawTimer(timer):
+    font = pygame.font.SysFont('Consolas', 30)
+    timer_display = font.render("Timer: " + str(timer), 1, (0, 0, 0))
+    pygame.draw.rect(DISPLAYSURF, WHITE, (8, 20, 190, 50))
+    DISPLAYSURF.blit(timer_display, (10, 30))
 
 
 
@@ -60,7 +77,7 @@ def getColour(x, y):
 
 def checkIfOnCircle():
     mouse = pygame.mouse.get_pos()
-    return (DISPLAYSURF.get_at((mouse[0], mouse[1])) == RED)
+    return (DISPLAYSURF.get_at((mouse[0], mouse[1])) == CIRCLECOLOUR)
 
 
 def printScore():
@@ -91,19 +108,19 @@ def drawGameOver():
 def arcadeMode():
     mousex = 0  # used to store x coordinate of mouse event
     mousey = 0  # used to store y coordinate of mouse event
+    circleX = 0
+    circleY = 0
     printScore()
-    drawCircle()
+    circleX, circleY = drawCircle(circleX, circleY, True)
     pygame.time.set_timer(pygame.USEREVENT, 1000)
-    font = pygame.font.SysFont('Consolas', 30)
+
 
     timer = 30
     #  Used to correctly implement seconds
     pygame.time.set_timer(USEREVENT + 1, 1000)
 
     while True:
-        timer_display = font.render("Timer: " + str(timer), 1, (0, 0, 0))
-        pygame.draw.rect(DISPLAYSURF, WHITE, (8, 20, 190, 50))
-        DISPLAYSURF.blit(timer_display, (10, 30))
+        drawTimer(timer)
 
         mouseClicked = False
         for event in pygame.event.get():
@@ -123,13 +140,16 @@ def arcadeMode():
             if (checkIfOnCircle() is True):
                 global points
                 points += 1
-                DISPLAYSURF.fill(WHITE)
-                drawCircle()
+                circleX, circleY = drawCircle(circleX, circleY, True)
                 printScore()
                 playSound()
 
         if timer <= 0:
             drawGameOver()
+
+
+        circleX, circleY = drawCircle(circleX, circleY, False)
+
 
         pygame.display.update()
         FPSCLOCK.tick(FPS)
@@ -138,8 +158,12 @@ def arcadeMode():
 def survivalMode():
     mousex = 0  # used to store x coordinate of mouse event
     mousey = 0  # used to store y coordinate of mouse event
+
+    circleX = 0
+    circleY = 0
+
     printScore()
-    drawCircle()
+    circleX, circleY = drawCircle(circleX, circleY, True)
     pygame.time.set_timer(pygame.USEREVENT, 1000)
     font = pygame.font.SysFont('Consolas', 30)
 
@@ -148,10 +172,7 @@ def survivalMode():
     pygame.time.set_timer(USEREVENT + 1, 1000)
 
     while True:
-        timer_display = font.render("Timer: " + str(timer), 1, (0, 0, 0))
-        pygame.draw.rect(DISPLAYSURF, WHITE, (8, 20, 190, 50))
-        DISPLAYSURF.blit(timer_display, (10, 30))
-
+        drawTimer(timer)
         mouseClicked = False
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -170,8 +191,7 @@ def survivalMode():
             if (checkIfOnCircle() is True):
                 global points
                 points += 1
-                DISPLAYSURF.fill(WHITE)
-                drawCircle()
+                circleX, circleY = drawCircle(circleX, circleY, True)
                 printScore()
                 playSound()
                 if timer < 2:
@@ -180,32 +200,59 @@ def survivalMode():
         if timer <= 0:
             drawGameOver()
 
+        circleX, circleY = drawCircle(circleX, circleY, False)
+
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
-
-
-def drawMenu():
+def drawOptions():
     while True:
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
 
-        button("Arcade", 230, 200, 190, 50, WHITE, RED, "arcade")
-        button("Survival", 230, 250, 190, 50, WHITE, RED, "survival")
+        button("", 230, 150, 50, 50, BLUE, BLUE, "blue", True)
+        button("", 300, 150, 50, 50, GREEN, GREEN, "green", True)
+        button("Main Menu", 230, 350, 190, 50, WHITE, RED, "menu")
+
+        pygame.display.update()
+        FPSCLOCK.tick(FPS)
+
+def drawMenu():
+    global points
+    points = 0
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+
+        button("Arcade", 230, 150, 190, 50, WHITE, RED, "arcade")
+        button("Survival", 230, 200, 190, 50, WHITE, RED, "survival")
+        button("Options", 230, 250, 190, 50, WHITE, RED, "options")
         button("Quit", 230, 300, 190, 50, WHITE, RED, "quit")
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
 
-def button(msg, x, y, w, h, inactiveColour, activeColour, action=None):
+def button(msg, x, y, w, h, inactiveColour, activeColour, action=None, colourSelection = False):
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
     # print(mouse)
     # if mouse is inside the box
+    global CIRCLECOLOUR
+
+    if colourSelection is True:
+        drawButtonBorder(x, y, w, h)
+
+
     if x + w > mouse[0] > x and y + h > mouse[1] > y:
+        
+
+
         pygame.draw.rect(DISPLAYSURF, activeColour, (x, y, w, h))
+
         if click[0] == 1 and action is not None:
             if action == "survival":
                 DISPLAYSURF.fill(WHITE)
@@ -216,9 +263,22 @@ def button(msg, x, y, w, h, inactiveColour, activeColour, action=None):
             elif action == "menu":
                 DISPLAYSURF.fill(WHITE)
                 drawMenu()
+            elif action == "options":
+                DISPLAYSURF.fill(WHITE)
+                drawOptions()
             elif action == "quit":
                 pygame.quit()
                 sys.exit()
+            elif action == "blue":
+                print("Blue")
+                CIRCLECOLOUR = BLUE
+                print(CIRCLECOLOUR)
+            elif action == "green":
+                CIRCLECOLOUR = GREEN
+                print(CIRCLECOLOUR)
+
+        
+
     else:
         pygame.draw.rect(DISPLAYSURF, inactiveColour, (x, y, w, h))
 
@@ -226,6 +286,15 @@ def button(msg, x, y, w, h, inactiveColour, activeColour, action=None):
     textSurf, textRect = textObjects(msg, smallText)
     textRect.center = ((x + (w/2), (y + (h/2))))
     DISPLAYSURF.blit(textSurf, textRect)
+
+def drawButtonBorder(x, y, w, h):
+    mouse = pygame.mouse.get_pos()
+    # print(mouse)
+    # if mouse is inside the box
+    if x + w > mouse[0] > x and y + h > mouse[1] > y:
+        pygame.draw.rect(DISPLAYSURF, HIGHLIGHTCOLOUR, (x - 5, y - 5, w + 10, h + 10), 4)
+    else:
+        pygame.draw.rect(DISPLAYSURF, WHITE, (x - 5, y - 5, w + 10, h + 10), 4)
 
 
 def main():
