@@ -59,32 +59,31 @@ def getColour(x, y):
     return DISPLAYSURF.get_at((x, y))
 
 
-def checkIfOnCircle():
-    mouse = pygame.mouse.get_pos()
-    return (DISPLAYSURF.get_at((mouse[0], mouse[1])) == CIRCLECOLOUR)
-
-
-def drawCircle(x, y, intialise=False):
+def checkifCircleClicked(x, y):
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
 
     xSquared = (mouse[0] - x)**2
     ySquared = (mouse[1] - y)**2
+    return math.sqrt(xSquared + ySquared) < 10 and click[0] == 1
+
+
+def drawCircle(x, y, intialise=False):
 
     hit = False
 
-    if (math.sqrt(xSquared + ySquared) < 10 and click[0] == 1) or intialise:
+    if (checkifCircleClicked(x, y)) or intialise:
         # if circle is clicked
         pygame.draw.circle(DISPLAYSURF, WHITE, (x, y), 10, 0)
-        x = random.randint(15, WINDOWWIDTH-10)
+        x = random.randint(15, WINDOWWIDTH - 10)
 
         # Prevents from spawning circles over the timer and score
         if x < 200:
-            y = random.randint(75, WINDOWHEIGHT-10)
+            y = random.randint(75, WINDOWHEIGHT - 10)
         elif x > WINDOWWIDTH - 200:
             y = random.randint(0, WINDOWHEIGHT - 75)
         else:
-            y = random.randint(0, WINDOWHEIGHT-10)
+            y = random.randint(0, WINDOWHEIGHT - 10)
 
         hit = True
 
@@ -237,9 +236,7 @@ def survivalMode():
             elif event.type == USEREVENT + 1:
                 timer -= 1
 
-
-
-        if mouseClicked and not checkIfOnCircle():
+        if mouseClicked and not checkifCircleClicked(circleX, circleY):
             # if clicked and missed
             timer -= 1
 
