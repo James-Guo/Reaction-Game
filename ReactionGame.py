@@ -5,14 +5,19 @@ import pygame.mixer
 import math
 import time
 from pygame.locals import *
+
 #  start pygame
 pygame.init()
 pygame.display.set_caption('Reaction Game')
 
-FPS = 60            # frames per second, the general speed of the program
-WINDOWWIDTH = 640   # size of window's width in pixels
-WINDOWHEIGHT = 480  # size of windows' height in pixels
-SCORE = 0
+FPS = 60                # frames per second, the general speed of the program
+WINDOWWIDTH = 640       # size of window's width in pixels
+WINDOWHEIGHT = 480      # size of windows' height in pixels
+
+XMARGIN = 100
+YMARGIN = 50
+
+SCORE = 0               # holds the score
 ARCADEHIGHSCORE = 0
 SURVIVALHIGHSCORE = 0
 PAUSE = False
@@ -98,7 +103,7 @@ def arcadeMode():
     circleX = 0
     circleY = 0
 
-    drawText(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT, "Score: " + str(SCORE), TEXTCOLOUR)
+    drawText(WINDOWWIDTH - XMARGIN, WINDOWHEIGHT - YMARGIN, LARGETEXT, "Score: " + str(SCORE), TEXTCOLOUR)
     circleX, circleY, hit = drawCircle(circleX, circleY, True)
     pygame.time.set_timer(pygame.USEREVENT, 1000)
 
@@ -107,7 +112,7 @@ def arcadeMode():
     pygame.time.set_timer(USEREVENT + 1, 1000)
 
     while True:
-        drawTimer(100, WINDOWHEIGHT - 50, LARGETEXT, timer, TEXTCOLOUR)
+        drawTimer(XMARGIN, WINDOWHEIGHT - YMARGIN, LARGETEXT, timer, TEXTCOLOUR)
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -127,7 +132,7 @@ def arcadeMode():
         if hit:
             #  If clicked on a circle
             SCORE += 1
-            drawText(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT , "Score: " + str(SCORE), TEXTCOLOUR)
+            drawText(WINDOWWIDTH - XMARGIN, WINDOWHEIGHT - YMARGIN, LARGETEXT , "Score: " + str(SCORE), TEXTCOLOUR)
             playSound()
 
         checkIfGameOver(timer, "arcade")
@@ -143,7 +148,7 @@ def survivalMode():
     circleX = 0
     circleY = 0
 
-    drawText(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT , "Score: " + str(SCORE), TEXTCOLOUR)
+    drawText(WINDOWWIDTH - XMARGIN, WINDOWHEIGHT - YMARGIN, LARGETEXT , "Score: " + str(SCORE), TEXTCOLOUR)
     circleX, circleY, hit = drawCircle(circleX, circleY, True)
     pygame.time.set_timer(pygame.USEREVENT, 1000)
 
@@ -152,7 +157,7 @@ def survivalMode():
     pygame.time.set_timer(USEREVENT + 1, 1000)
 
     while True:
-        drawTimer(100, WINDOWHEIGHT - 50, LARGETEXT, timer, TEXTCOLOUR)
+        drawTimer(XMARGIN, WINDOWHEIGHT - YMARGIN, LARGETEXT, timer, TEXTCOLOUR)
 
         mouseClicked = False
 
@@ -181,7 +186,7 @@ def survivalMode():
         if hit:
             #  if clicked a circle
             SCORE += 1
-            drawText(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT, "Score: " + str(SCORE), TEXTCOLOUR)
+            drawText(WINDOWWIDTH - XMARGIN, WINDOWHEIGHT - YMARGIN, LARGETEXT, "Score: " + str(SCORE), TEXTCOLOUR)
             playSound()
             if timer < 5:
                 timer += 1
@@ -265,7 +270,7 @@ def drawGameOver(highScore):
         DISPLAYSURF.blit(gameover_display, (WINDOWWIDTH/2 - 80, WINDOWHEIGHT/2 - 25))
 
         drawText(330, 280, SMALLTEXT, "High Score: " + str(highScore), CIRCLECOLOUR)
-        drawText(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT, "Score: " + str(SCORE), TEXTCOLOUR)
+        drawText(WINDOWWIDTH - XMARGIN, WINDOWHEIGHT - YMARGIN, LARGETEXT, "Score: " + str(SCORE), TEXTCOLOUR)
 
         button("Main Menu", 230, 350, 190, 50, BACKGROUNDCOLOUR, CIRCLECOLOUR, "menu")
 
@@ -299,7 +304,7 @@ def pause():
         FPSCLOCK.tick(FPS)
 
     DISPLAYSURF.fill(BACKGROUNDCOLOUR)
-    drawText(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT, "Score: " + str(SCORE), CIRCLECOLOUR)
+    drawText(WINDOWWIDTH - XMARGIN, WINDOWHEIGHT - YMARGIN, LARGETEXT, "Score: " + str(SCORE), CIRCLECOLOUR)
 
 
 def drawOptions():
@@ -336,7 +341,7 @@ def darkModeCheckbox(x, y, w, h):
 
         # prevents the left click from being held down
         time.sleep(0.1)
-    
+
         if BACKGROUNDCOLOUR == WHITE:
             BACKGROUNDCOLOUR = BLACK
             TEXTCOLOUR = WHITE
