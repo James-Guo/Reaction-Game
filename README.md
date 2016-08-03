@@ -6,24 +6,24 @@ Basic game that randomly spawns a circle which requires it to be clicked quickly
 ![](screenshots/playing.png "Playing")
 
 ## Setup
-Requires Python 3 and Pygame
+Requires [Python 3](https://www.python.org/downloads/) and [Pygame](http://www.pygame.org/download.shtml)
 
 
-Installing pygame
-    Pygame by going to the [pygame website](http://www.pygame.org/download.shtml) or can b
-    e installed with pip 
+ **Installing pygame**
+
 <pre><code>pip install pygame</code></pre>
 
-Clone this repo
-    <pre><code>git clone https://github.com/James-Guo/Reaction-Game.git</code></pre>
+**Clone this repo**
+<pre><code>git clone https://github.com/James-Guo/Reaction-Game.git</code></pre>
 
 
-Run the code
+**Run the code**
 
 
 ## Features
 - Arcade mode
 - Survival mode
+- Dark theme
 - Change circle colours
 
 
@@ -40,4 +40,4 @@ Run the code
 ## Future ideas
 - Chase mode
 - Maybe add multiple circles
-- Dark mode
+- Add border
