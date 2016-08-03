@@ -3,8 +3,8 @@ import pygame
 import sys
 import pygame.mixer
 import math
+import time
 from pygame.locals import *
-
 #  start pygame
 pygame.init()
 
@@ -21,9 +21,11 @@ BLUE = (32, 78, 230)
 PURPLE = (160, 32, 240)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-DARK_RED = (200, 0, 0)
-HIGHLIGHTCOLOUR = DARK_RED
-CIRCLECOLOUR = RED
+DARKRED = (200, 0, 0)
+HIGHLIGHTCOLOUR = DARKRED
+CIRCLECOLOUR = BLUE
+BACKGROUNDCOLOUR = BLACK
+TEXTCOLOUR = WHITE
 
 #  fonts used
 LARGETEXT = pygame.font.Font('freesansbold.ttf', 32)
@@ -39,7 +41,7 @@ global FPSCLOCK
 FPSCLOCK = pygame.time.Clock()
 
 pygame.display.set_caption('Reaction Game')
-DISPLAYSURF.fill(WHITE)
+DISPLAYSURF.fill(BACKGROUNDCOLOUR)
 
 SCORE = 0
 ARCADEHIGHSCORE = 0
@@ -84,10 +86,10 @@ def drawMenu():
         drawScore(523, 50, SMALLTEXT, 'Survival Highscore: ', SURVIVALHIGHSCORE, CIRCLECOLOUR)
 
         #  draw buttons
-        button("Arcade", 230, 150, 190, 50, WHITE, CIRCLECOLOUR, "arcade")
-        button("Survival", 230, 200, 190, 50, WHITE, CIRCLECOLOUR, "survival")
-        button("Options", 230, 250, 190, 50, WHITE, CIRCLECOLOUR, "options")
-        button("Quit", 230, 300, 190, 50, WHITE, CIRCLECOLOUR, "quit")
+        button("Arcade", 230, 150, 190, 50, BACKGROUNDCOLOUR, CIRCLECOLOUR, "arcade")
+        button("Survival", 230, 200, 190, 50, BACKGROUNDCOLOUR, CIRCLECOLOUR, "survival")
+        button("Options", 230, 250, 190, 50, BACKGROUNDCOLOUR, CIRCLECOLOUR, "options")
+        button("Quit", 230, 300, 190, 50, BACKGROUNDCOLOUR, CIRCLECOLOUR, "quit")
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
@@ -99,7 +101,7 @@ def arcadeMode():
     circleX = 0
     circleY = 0
 
-    drawScore(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT, 'Score: ', SCORE, CIRCLECOLOUR)
+    drawScore(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT, 'Score: ', SCORE, TEXTCOLOUR)
     circleX, circleY, hit = drawCircle(circleX, circleY, True)
     pygame.time.set_timer(pygame.USEREVENT, 1000)
 
@@ -108,7 +110,7 @@ def arcadeMode():
     pygame.time.set_timer(USEREVENT + 1, 1000)
 
     while True:
-        drawTimer(timer)
+        drawTimer(100, WINDOWHEIGHT - 50, LARGETEXT, timer, TEXTCOLOUR)
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -127,7 +129,7 @@ def arcadeMode():
         if hit:
             #  If clicked on a circle
             SCORE += 1
-            drawScore(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT , 'Score: ', SCORE, CIRCLECOLOUR)
+            drawScore(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT , 'Score: ', SCORE, TEXTCOLOUR)
             playSound()
 
         checkIfGameOver(timer, "arcade")
@@ -143,7 +145,7 @@ def survivalMode():
     circleX = 0
     circleY = 0
 
-    drawScore(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT , 'Score: ', SCORE, CIRCLECOLOUR)
+    drawScore(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT , 'Score: ', SCORE, TEXTCOLOUR)
     circleX, circleY, hit = drawCircle(circleX, circleY, True)
     pygame.time.set_timer(pygame.USEREVENT, 1000)
 
@@ -152,7 +154,7 @@ def survivalMode():
     pygame.time.set_timer(USEREVENT + 1, 1000)
 
     while True:
-        drawTimer(timer)
+        drawTimer(100, WINDOWHEIGHT - 50, LARGETEXT, timer, TEXTCOLOUR)
 
         mouseClicked = False
 
@@ -181,7 +183,7 @@ def survivalMode():
         if hit:
             #  if clicked a circle
             SCORE += 1
-            drawScore(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT, 'Score: ', SCORE, CIRCLECOLOUR)
+            drawScore(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT, 'Score: ', SCORE, TEXTCOLOUR)
             playSound()
             if timer < 5:
                 timer += 1
@@ -213,7 +215,7 @@ def drawCircle(x, y, intialise=False):
         #  if circle is clicked
 
         #  redraw circle
-        pygame.draw.circle(DISPLAYSURF, WHITE, (x, y), 10, 0)
+        pygame.draw.circle(DISPLAYSURF, BACKGROUNDCOLOUR, (x, y), 10, 0)
         x = random.randint(15, WINDOWWIDTH - 10)
 
         #  prevents from spawning circles in bad locations
@@ -231,16 +233,28 @@ def drawCircle(x, y, intialise=False):
     return x, y, hit
 
 
-def drawTimer(timer):
-    font = pygame.font.SysFont('Consolas', 30)
-    timer_display = font.render("Timer: " + str(timer), 1, (0, 0, 0))
-    pygame.draw.rect(DISPLAYSURF, WHITE, (8, 20, 190, 50))
-    DISPLAYSURF.blit(timer_display, (10, 30))
+
+def drawText(x, y, textSize, text, colour):
+    textSurfaceObj = textSize.render(str(text), True, colour, BACKGROUNDCOLOUR)
+    textRectObj = textSurfaceObj.get_rect()
+    textRectObj.center = (x, y)
+    DISPLAYSURF.blit(textSurfaceObj, textRectObj)
+
+
+def drawTimer(x, y, textSize, timer, colour):
+    textSurfaceObj = textSize.render(str("Timer: " + str(timer)), True, colour, BACKGROUNDCOLOUR)
+    textRectObj = textSurfaceObj.get_rect()
+    textRectObj.center = (x, y)
+
+    # hard coded value to refresh a specific part of the screen
+    pygame.draw.rect(DISPLAYSURF, BACKGROUNDCOLOUR, (20, 400, 200, 70))
+
+    DISPLAYSURF.blit(textSurfaceObj, textRectObj)
 
 
 def drawScore(x, y, textSize, text, score, colour):
     scoreStr = str(score)
-    textSurfaceObj = textSize.render(str(text + scoreStr), True, colour, WHITE)
+    textSurfaceObj = textSize.render(str(text + scoreStr), True, colour, BACKGROUNDCOLOUR)
     textRectObj = textSurfaceObj.get_rect()
     textRectObj.center = (x, y)
     DISPLAYSURF.blit(textSurfaceObj, textRectObj)
@@ -248,7 +262,7 @@ def drawScore(x, y, textSize, text, score, colour):
 
 def drawGameOver(highScore):
     global SCORE
-    DISPLAYSURF.fill(WHITE)
+    DISPLAYSURF.fill(BACKGROUNDCOLOUR)
     while True:
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -257,13 +271,13 @@ def drawGameOver(highScore):
                 sys.exit()
 
         #  draw game over text
-        gameover_display = LARGETEXT.render('Game over!', True, RED, WHITE)
+        gameover_display = LARGETEXT.render('Game over!', True, CIRCLECOLOUR, BACKGROUNDCOLOUR)
         DISPLAYSURF.blit(gameover_display, (WINDOWWIDTH/2 - 80, WINDOWHEIGHT/2 - 25))
 
         drawScore(330, 300, SMALLTEXT, 'High Score ', highScore, BLACK)
 
         drawScore(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT, 'Score: ', SCORE, CIRCLECOLOUR)
-        button("Main Menu", 230, 350, 190, 50, WHITE, CIRCLECOLOUR, "menu")
+        button("Main Menu", 230, 350, 190, 50, BACKGROUNDCOLOUR, CIRCLECOLOUR, "menu")
 
         pygame.display.update()
         FPSCLOCK.tick(FPS)
@@ -282,19 +296,19 @@ def pause():
                 pygame.quit()
                 sys.exit()
 
-        DISPLAYSURF.fill(WHITE)
+        DISPLAYSURF.fill(BACKGROUNDCOLOUR)
 
-        gameover_display = LARGETEXT.render('Game paused!', True, RED, WHITE)
+        gameover_display = LARGETEXT.render('Game paused!', True, RED, BACKGROUNDCOLOUR)
         DISPLAYSURF.blit(gameover_display, (220, 150))
 
-        button("Continue", 230, 300, 190, 50, WHITE, CIRCLECOLOUR, "unpause")
-        button("Main Menu", 230, 350, 190, 50, WHITE, CIRCLECOLOUR, "menu")
-        button("Quit", 230, 400, 190, 50, WHITE, CIRCLECOLOUR, "quit")
+        button("Continue", 230, 300, 190, 50, BACKGROUNDCOLOUR, CIRCLECOLOUR, "unpause")
+        button("Main Menu", 230, 350, 190, 50, BACKGROUNDCOLOUR, CIRCLECOLOUR, "menu")
+        button("Quit", 230, 400, 190, 50, BACKGROUNDCOLOUR, CIRCLECOLOUR, "quit")
 
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
-    DISPLAYSURF.fill(WHITE)
+    DISPLAYSURF.fill(BACKGROUNDCOLOUR)
     drawScore(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT, 'Score: ', SCORE, CIRCLECOLOUR)
 
 
@@ -306,17 +320,38 @@ def drawOptions():
                 pygame.quit()
                 sys.exit()
 
-        colourSelectionButton(230, 150, 50, 50, RED)
-        colourSelectionButton(300, 150, 50, 50, ORANGE)
-        colourSelectionButton(370, 150, 50, 50, YELLOW)
-        colourSelectionButton(230, 220, 50, 50, GREEN)
-        colourSelectionButton(300, 220, 50, 50, BLUE)
-        colourSelectionButton(370, 220, 50, 50, PURPLE)
+        drawText(330, 70, SMALLTEXT, "Circle colour", TEXTCOLOUR)
+        colourSelectionButton(230, 100, 50, 50, RED)
+        colourSelectionButton(300, 100, 50, 50, ORANGE)
+        colourSelectionButton(370, 100, 50, 50, YELLOW)
+        colourSelectionButton(230, 170, 50, 50, GREEN)
+        colourSelectionButton(300, 170, 50, 50, BLUE)
+        colourSelectionButton(370, 170, 50, 50, PURPLE)
 
-        button("Main Menu", 230, 350, 190, 50, WHITE, CIRCLECOLOUR, "menu")
+        drawText(310, 265, SMALLTEXT, "Theme:", TEXTCOLOUR)
+        darkModeCheckbox(370, 250, 30, 30)
+        button("Main Menu", 230, 350, 190, 50, BACKGROUNDCOLOUR, CIRCLECOLOUR, "menu")
 
         pygame.display.update()
         FPSCLOCK.tick(FPS)
+
+
+def darkModeCheckbox(x, y, w, h):
+    global BACKGROUNDCOLOUR, TEXTCOLOUR
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
+
+    if x + w > mouse[0] > x and y + h > mouse[1] > y and click[0] == 1:
+        time.sleep(0.1)
+        if BACKGROUNDCOLOUR == WHITE:
+            BACKGROUNDCOLOUR = BLACK
+            TEXTCOLOUR = WHITE
+        elif BACKGROUNDCOLOUR == BLACK:
+            BACKGROUNDCOLOUR = WHITE
+            TEXTCOLOUR = BLACK
+        DISPLAYSURF.fill(BACKGROUNDCOLOUR)
+
+    pygame.draw.rect(DISPLAYSURF, TEXTCOLOUR, (x, y, w, h))
 
 
 def colourSelectionButton(x, y, w, h, colour):
@@ -345,10 +380,11 @@ def button(msg, x, y, w, h, inactiveColour, activeColour, action=None):
 
         if click[0] == 1 and action is not None:
             #  if mouse clicked
+            time.sleep(0.1)
             if action == "unpause":
                 unpause()
 
-            DISPLAYSURF.fill(WHITE)
+            DISPLAYSURF.fill(BACKGROUNDCOLOUR)
 
             if action == "survival":
                 survivalMode()
@@ -380,12 +416,12 @@ def drawButtonBorder(x, y, w, h):
     if x + w > mouse[0] > x and y + h > mouse[1] > y:
         pygame.draw.rect(DISPLAYSURF, HIGHLIGHTCOLOUR, (x - 5, y - 5, w + 10, h + 10), 4)
     else:
-        pygame.draw.rect(DISPLAYSURF, WHITE, (x - 5, y - 5, w + 10, h + 10), 4)
+        pygame.draw.rect(DISPLAYSURF, BACKGROUNDCOLOUR, (x - 5, y - 5, w + 10, h + 10), 4)
 
 
 # Helper function for rendering fonts
 def textObjects(text, font):
-    textSurface = font.render(text, True, BLACK)
+    textSurface = font.render(text, True, TEXTCOLOUR)
     return textSurface, textSurface.get_rect()
 
 
