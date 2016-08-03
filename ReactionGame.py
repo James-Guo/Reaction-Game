@@ -236,7 +236,6 @@ def drawCircle(x, y, intialise=False):
     return x, y, hit
 
 
-
 def drawText(x, y, textSize, text, colour):
     textSurfaceObj = textSize.render(str(text), True, colour, BACKGROUNDCOLOUR)
     textRectObj = textSurfaceObj.get_rect()
@@ -293,7 +292,7 @@ def pause():
 
         DISPLAYSURF.fill(BACKGROUNDCOLOUR)
 
-        gameover_display = LARGETEXT.render('Game paused!', True, RED, BACKGROUNDCOLOUR)
+        gameover_display = LARGETEXT.render('Game paused!', True, CIRCLECOLOUR, BACKGROUNDCOLOUR)
         DISPLAYSURF.blit(gameover_display, (220, 150))
 
         button("Continue", 230, 300, 190, 50, BACKGROUNDCOLOUR, CIRCLECOLOUR, "unpause")
