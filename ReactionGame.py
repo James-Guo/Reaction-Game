@@ -7,10 +7,15 @@ import time
 from pygame.locals import *
 #  start pygame
 pygame.init()
+pygame.display.set_caption('Reaction Game')
 
-FPS = 60   # frames per second, the general speed of the program
+FPS = 60            # frames per second, the general speed of the program
 WINDOWWIDTH = 640   # size of window's width in pixels
 WINDOWHEIGHT = 480  # size of windows' height in pixels
+SCORE = 0
+ARCADEHIGHSCORE = 0
+SURVIVALHIGHSCORE = 0
+PAUSE = False
 
 #  colours used
 RED = (255, 0, 0)
@@ -35,19 +40,11 @@ beep = pygame.mixer.Sound('Beep.wav')
 #  surface object to draw on
 global DISPLAYSURF
 DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
+DISPLAYSURF.fill(BACKGROUNDCOLOUR)
 
 #  used to track FPS
 global FPSCLOCK
 FPSCLOCK = pygame.time.Clock()
-
-pygame.display.set_caption('Reaction Game')
-DISPLAYSURF.fill(BACKGROUNDCOLOUR)
-
-SCORE = 0
-ARCADEHIGHSCORE = 0
-SURVIVALHIGHSCORE = 0
-
-PAUSE = False
 
 
 def main():
@@ -82,8 +79,8 @@ def drawMenu():
                 pygame.quit()
                 sys.exit()
 
-        drawScore(530, 20, SMALLTEXT, 'Arcade Highscore: ', ARCADEHIGHSCORE, CIRCLECOLOUR)
-        drawScore(523, 50, SMALLTEXT, 'Survival Highscore: ', SURVIVALHIGHSCORE, CIRCLECOLOUR)
+        drawText(530, 20, SMALLTEXT, "Arcade Highscore: " + str(ARCADEHIGHSCORE), CIRCLECOLOUR)
+        drawText(523, 50, SMALLTEXT, "Survival Highscore: " + str(SURVIVALHIGHSCORE), CIRCLECOLOUR)
 
         #  draw buttons
         button("Arcade", 230, 150, 190, 50, BACKGROUNDCOLOUR, CIRCLECOLOUR, "arcade")
@@ -101,7 +98,7 @@ def arcadeMode():
     circleX = 0
     circleY = 0
 
-    drawScore(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT, 'Score: ', SCORE, TEXTCOLOUR)
+    drawText(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT, "Score: " + str(SCORE), TEXTCOLOUR)
     circleX, circleY, hit = drawCircle(circleX, circleY, True)
     pygame.time.set_timer(pygame.USEREVENT, 1000)
 
@@ -119,6 +116,7 @@ def arcadeMode():
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
+                    # if ESC is pressed
                     PAUSE = True
                     pause()
             elif event.type == USEREVENT + 1:
@@ -129,7 +127,7 @@ def arcadeMode():
         if hit:
             #  If clicked on a circle
             SCORE += 1
-            drawScore(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT , 'Score: ', SCORE, TEXTCOLOUR)
+            drawText(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT , "Score: " + str(SCORE), TEXTCOLOUR)
             playSound()
 
         checkIfGameOver(timer, "arcade")
@@ -145,7 +143,7 @@ def survivalMode():
     circleX = 0
     circleY = 0
 
-    drawScore(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT , 'Score: ', SCORE, TEXTCOLOUR)
+    drawText(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT , "Score: " + str(SCORE), TEXTCOLOUR)
     circleX, circleY, hit = drawCircle(circleX, circleY, True)
     pygame.time.set_timer(pygame.USEREVENT, 1000)
 
@@ -183,7 +181,7 @@ def survivalMode():
         if hit:
             #  if clicked a circle
             SCORE += 1
-            drawScore(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT, 'Score: ', SCORE, TEXTCOLOUR)
+            drawText(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT, "Score: " + str(SCORE), TEXTCOLOUR)
             playSound()
             if timer < 5:
                 timer += 1
@@ -201,11 +199,11 @@ def checkIfGameOver(timer, mode):
         if mode == "survival":
             if SCORE > SURVIVALHIGHSCORE:
                 SURVIVALHIGHSCORE = SCORE
+            drawGameOver(SURVIVALHIGHSCORE)
         if mode == "arcade":
             if SCORE > ARCADEHIGHSCORE:
                 ARCADEHIGHSCORE = SCORE
-
-        drawGameOver(SCORE)
+            drawGameOver(ARCADEHIGHSCORE)
 
 
 def drawCircle(x, y, intialise=False):
@@ -252,14 +250,6 @@ def drawTimer(x, y, textSize, timer, colour):
     DISPLAYSURF.blit(textSurfaceObj, textRectObj)
 
 
-def drawScore(x, y, textSize, text, score, colour):
-    scoreStr = str(score)
-    textSurfaceObj = textSize.render(str(text + scoreStr), True, colour, BACKGROUNDCOLOUR)
-    textRectObj = textSurfaceObj.get_rect()
-    textRectObj.center = (x, y)
-    DISPLAYSURF.blit(textSurfaceObj, textRectObj)
-
-
 def drawGameOver(highScore):
     global SCORE
     DISPLAYSURF.fill(BACKGROUNDCOLOUR)
@@ -274,9 +264,9 @@ def drawGameOver(highScore):
         gameover_display = LARGETEXT.render('Game over!', True, CIRCLECOLOUR, BACKGROUNDCOLOUR)
         DISPLAYSURF.blit(gameover_display, (WINDOWWIDTH/2 - 80, WINDOWHEIGHT/2 - 25))
 
-        drawScore(330, 300, SMALLTEXT, 'High Score ', highScore, BLACK)
+        drawText(330, 280, SMALLTEXT, "High Score: " + str(highScore), CIRCLECOLOUR)
+        drawText(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT, "Score: " + str(SCORE), TEXTCOLOUR)
 
-        drawScore(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT, 'Score: ', SCORE, CIRCLECOLOUR)
         button("Main Menu", 230, 350, 190, 50, BACKGROUNDCOLOUR, CIRCLECOLOUR, "menu")
 
         pygame.display.update()
@@ -309,7 +299,7 @@ def pause():
         FPSCLOCK.tick(FPS)
 
     DISPLAYSURF.fill(BACKGROUNDCOLOUR)
-    drawScore(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT, 'Score: ', SCORE, CIRCLECOLOUR)
+    drawText(WINDOWWIDTH - 100, WINDOWHEIGHT - 50, LARGETEXT, "Score: " + str(SCORE), CIRCLECOLOUR)
 
 
 def drawOptions():
@@ -342,7 +332,11 @@ def darkModeCheckbox(x, y, w, h):
     click = pygame.mouse.get_pressed()
 
     if x + w > mouse[0] > x and y + h > mouse[1] > y and click[0] == 1:
+        # if mouse clicked in the box
+
+        # prevents the left click from being held down
         time.sleep(0.1)
+    
         if BACKGROUNDCOLOUR == WHITE:
             BACKGROUNDCOLOUR = BLACK
             TEXTCOLOUR = WHITE
@@ -380,7 +374,10 @@ def button(msg, x, y, w, h, inactiveColour, activeColour, action=None):
 
         if click[0] == 1 and action is not None:
             #  if mouse clicked
+
+            # prevents the left click from being held down
             time.sleep(0.1)
+
             if action == "unpause":
                 unpause()
 
