@@ -2,8 +2,9 @@
 
 Basic game that randomly spawns a circle which requires it to be clicked quickly
 
-![](screenshots/MainMenu.png "Main Menu")
-![](screenshots/playing.png "Playing")
+Main menu           |  Gameplay
+:-------------------------:|:-------------------------:
+![](screenshots/MainMenu.png "Main Menu") |  ![](screenshots/playing.png "Playing")
 
 ## Setup
 Requires [Python 3](https://www.python.org/downloads/) and [Pygame](http://www.pygame.org/download.shtml)
@@ -25,16 +26,14 @@ Requires [Python 3](https://www.python.org/downloads/) and [Pygame](http://www.p
 - Survival mode
 - Dark theme
 - Change circle colours
-
-
-![](screenshots/options.png "Options")
-
-
-
 - Saves highscores
 - Ability to pause
 
-![](screenshots/pause.png "Pause")
+Options menu             |  Pause screen
+:-------------------------:|:-------------------------:
+![](screenshots/options.png "Options") |  ![](screenshots/pause.png "Pause")
+
+
 
 
 ## Future ideas
